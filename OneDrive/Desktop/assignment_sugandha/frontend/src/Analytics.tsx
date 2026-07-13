@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { BarChart3, TrendingUp, PieChart, Users, Activity, ShieldAlert } from 'lucide-react';
+import { BarChart3, TrendingUp, PieChart as PieChartIcon, Users, Activity, ShieldAlert } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useGlobal } from './context/GlobalContext';
 import { EmptyState } from './components/ui/empty-state';
 
@@ -59,20 +60,16 @@ export default function Analytics() {
             <CardHeader className="bg-muted/30 border-b">
               <CardTitle className="text-base flex items-center gap-2"><TrendingUp className="w-4 h-4 text-indigo-500"/> Monthly Spending Trend</CardTitle>
             </CardHeader>
-            <CardContent className="p-8 flex items-end justify-between h-64 gap-2">
-              {data.monthly_spend.map((item: any, i: number) => {
-                const max = Math.max(...data.monthly_spend.map((d: any) => d.amount));
-                const height = max > 0 ? (item.amount / max) * 100 : 0;
-                return (
-                  <div key={i} className="flex flex-col items-center flex-1 group">
-                    <div className="w-full bg-indigo-100 rounded-t-md relative flex items-end justify-center hover:bg-indigo-200 transition-colors" style={{ height: `${height}%` }}>
-                      <div className="absolute -top-8 text-xs font-bold text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">₹{Math.round(item.amount)}</div>
-                      <div className="w-full bg-indigo-500 rounded-t-md" style={{ height: '80%' }}></div>
-                    </div>
-                    <span className="text-xs text-muted-foreground mt-2">{item.month}</span>
-                  </div>
-                );
-              })}
+            <CardContent className="p-8 h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data.monthly_spend}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dx={-10} tickFormatter={(val) => `₹${val}`} />
+                  <Tooltip cursor={{fill: '#f1f5f9'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                  <Bar dataKey="amount" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={50} />
+                </BarChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
 
@@ -96,28 +93,59 @@ export default function Analytics() {
             </CardContent>
           </Card>
 
-          {/* Card 3: Settlement Trends */}
+          {/* Card 3: Category Breakdown */}
+          <Card className="premium-card">
+            <CardHeader className="bg-muted/30 border-b">
+              <CardTitle className="text-base flex items-center gap-2"><PieChartIcon className="w-4 h-4 text-emerald-500"/> Category Breakdown</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 h-[250px] flex items-center justify-center">
+                {data.expense_categories && data.expense_categories.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={data.expense_categories}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={2}
+                        dataKey="value"
+                      >
+                        {data.expense_categories.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => `₹${value}`} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="text-muted-foreground text-sm">No category data</div>
+                )}
+            </CardContent>
+          </Card>
+
+          {/* Card 4: Settlement Trends */}
           <Card className="premium-card">
             <CardHeader className="bg-muted/30 border-b">
               <CardTitle className="text-base flex items-center gap-2"><Activity className="w-4 h-4 text-orange-500"/> Settlement Trend</CardTitle>
             </CardHeader>
-            <CardContent className="p-6 flex items-end justify-between h-48 gap-2">
-              {data.settlement_trend.map((item: any, i: number) => {
-                const max = Math.max(...data.settlement_trend.map((d: any) => d.amount));
-                const height = max > 0 ? (item.amount / max) * 100 : 0;
-                return (
-                  <div key={i} className="flex flex-col items-center flex-1">
-                    <div className="w-full bg-orange-100 rounded-t-sm" style={{ height: `${height}%` }}>
-                      <div className="w-full bg-orange-400 opacity-80" style={{ height: '100%' }}></div>
-                    </div>
-                    <span className="text-xs text-muted-foreground mt-2">{item.date}</span>
-                  </div>
-                );
-              })}
+            <CardContent className="p-6 h-[250px]">
+                {data.settlement_trend && data.settlement_trend.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={data.settlement_trend}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+                      <Tooltip cursor={{fill: '#f1f5f9'}} formatter={(val) => `₹${val}`} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                      <Bar dataKey="amount" fill="#f97316" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex h-full items-center justify-center text-muted-foreground text-sm">No settlements yet</div>
+                )}
             </CardContent>
           </Card>
 
-          {/* Card 4: Import Quality */}
+          {/* Card 5: Import Quality */}
           <Card className="premium-card bg-slate-900 text-white border-slate-800">
             <CardHeader className="border-b border-slate-800 pb-4">
               <CardTitle className="text-base flex items-center gap-2 text-slate-100"><ShieldAlert className="w-4 h-4 text-indigo-400"/> Import Quality</CardTitle>
@@ -127,10 +155,10 @@ export default function Analytics() {
                 <div className="text-4xl font-bold text-indigo-400">{data.import_quality.health_score}%</div>
                 <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider">Health Score</p>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-3 max-h-[140px] overflow-y-auto">
                 {Object.entries(data.import_quality.anomalies_breakdown).map(([key, val]: [string, any], i: number) => (
                   <div key={i} className="flex justify-between items-center text-sm border-b border-slate-800 pb-2">
-                    <span className="text-slate-300">{key}</span>
+                    <span className="text-slate-300 capitalize">{key.replace(/_/g, ' ')}</span>
                     <span className="bg-slate-800 px-2 py-0.5 rounded text-white font-mono">{val}</span>
                   </div>
                 ))}

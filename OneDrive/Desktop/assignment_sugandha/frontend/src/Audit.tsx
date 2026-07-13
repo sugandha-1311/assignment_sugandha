@@ -85,8 +85,8 @@ export default function Audit() {
                       {new Date(log.timestamp).toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="font-semibold text-slate-900 bg-slate-100 px-2 py-1 rounded border border-slate-200">
-                        {log.action}
+                      <span className="font-semibold text-slate-900 bg-slate-100 px-2 py-1 rounded border border-slate-200 capitalize">
+                        {log.action.replace(/_/g, ' ').toLowerCase()}
                       </span>
                     </td>
                     <td className="px-6 py-4 font-medium text-indigo-600">

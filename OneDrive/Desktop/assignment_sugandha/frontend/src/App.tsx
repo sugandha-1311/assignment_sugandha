@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
+import { Toaster } from 'sonner';
 import { GlobalProvider } from './context/GlobalContext';
 import { Sidebar } from './components/layout/Sidebar';
 import { TopNav } from './components/layout/TopNav';
@@ -50,6 +51,7 @@ function App() {
           
           <FloatingActionButton />
           <CommandPalette />
+          <Toaster position="top-right" richColors />
         </div>
         </div>
       </Router>

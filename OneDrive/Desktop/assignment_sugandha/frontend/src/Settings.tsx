@@ -1,8 +1,22 @@
-import { Settings2, User, Palette, Globe, Shield, CreditCard } from 'lucide-react';
+import { useState } from 'react';
+import { Settings2, User, Palette, Globe, Shield, CreditCard, Save } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Button } from './components/ui/button';
+import { toast } from 'sonner';
 
 export default function Settings() {
+  const [name, setName] = useState('Sugandha Choudhary');
+  const [email, setEmail] = useState('sugandha@fairshare.app');
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      toast.success("Profile updated successfully.");
+    }, 500);
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-8 space-y-8">
       <div>
@@ -27,13 +41,28 @@ export default function Settings() {
             <CardContent className="p-6 space-y-4">
               <div className="space-y-1">
                 <label className="text-sm font-medium">Full Name</label>
-                <input type="text" defaultValue="Sugandha Choudhary" className="w-full px-3 py-2 border rounded-md" disabled />
+                <input 
+                  type="text" 
+                  value={name} 
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" 
+                />
               </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium">Email Address</label>
-                <input type="email" defaultValue="sugandha@fairshare.app" className="w-full px-3 py-2 border rounded-md" disabled />
+                <input 
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all" 
+                />
               </div>
-              
+              <div className="pt-2">
+                <Button onClick={handleSave} disabled={loading} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
+                  <Save className="w-4 h-4" />
+                  {loading ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
             </CardContent>
           </Card>
 

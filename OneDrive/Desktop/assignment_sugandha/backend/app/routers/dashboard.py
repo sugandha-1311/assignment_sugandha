@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from app.database import get_db
-from app.models.group import GroupMembership
+from app.models.group import GroupMembership, Group
 from app.models.import_models import Import, ImportAnomaly
 from app.models.audit import AuditLog
 from app.models.expense import Expense
@@ -39,8 +39,10 @@ def get_dashboard_overview(db: Session = Depends(get_db)):
             "type": a.entity_type
         })
         
+    total_groups = db.query(Group).count()
+
     return {
-        "is_empty": total_members == 0 and not latest_import and total_spend == 0,
+        "is_empty": total_groups == 0 and not latest_import and total_spend == 0,
         "kpis": {
             "members": total_members,
             "pending_reviews": pending_reviews,
